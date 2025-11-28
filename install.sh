@@ -2,283 +2,285 @@
 
 set -e
 
-echo "=========================================="
-echo "uConsole Dotfiles Installation Script"
-echo "=========================================="
-echo ""
+#
+# uConsole Dotfiles Installer - Modular TUI Version
+# Interactive installation system with whiptail
+#
 
-# Color definitions for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-# Function to print colored messages
-print_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Check if running on Debian
-if ! command -v apt &> /dev/null; then
-    print_error "This script requires Debian/Ubuntu with apt package manager"
-    exit 1
-fi
-
-print_info "Updating package lists..."
-sudo apt update
-
-print_info "Installing core Sway and Wayland components..."
-sudo apt install -y \
-    sway \
-    swayidle \
-    swaylock \
-    swaybg \
-    wl-clipboard \
-    wtype \
-    wlr-randr \
-    xdg-utils \
-    xdg-desktop-portal-wlr \
-    dunst
-
-print_info "Installing PipeWire audio system..."
-sudo apt install -y \
-    pipewire \
-    pipewire-alsa \
-    pipewire-pulse \
-    wireplumber \
-    pavucontrol
-
-print_info "Installing terminal and shell..."
-sudo apt install -y \
-    kitty \
-    zsh \
-    git \
-    curl \
-    wget \
-    unzip
-
-print_info "Installing application launcher and utilities..."
-sudo apt install -y \
-    wofi \
-    qutebrowser \
-    nautilus \
-    neovim \
-    htop
-
-print_info "Installing system utilities..."
-sudo apt install -y \
-    brightnessctl \
-    alsa-utils \
-    bluez \
-    network-manager \
-    systemd \
-    gnome-themes-extra
-
-print_info "Installing screenshot dependencies..."
-sudo apt install -y \
-    grim \
-    slurp \
-    jq
-
-# Install grimshot (usually in sway-contrib)
-if ! command -v grimshot &> /dev/null; then
-    print_info "Installing grimshot manually..."
-    sudo wget -O /usr/local/bin/grimshot \
-        https://raw.githubusercontent.com/swaywm/sway/master/contrib/grimshot
-    sudo chmod +x /usr/local/bin/grimshot
-fi
-
-print_info "Installing fonts..."
-sudo apt install -y \
-    fonts-terminus \
-    fonts-font-awesome \
-    fonts-noto \
-    fonts-noto-color-emoji
-
-# Install Nerd Fonts
-print_info "Installing JetBrainsMono Nerd Font..."
-FONT_DIR="$HOME/.local/share/fonts"
-mkdir -p "$FONT_DIR"
-
-if [ ! -f "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf" ]; then
-    print_info "Downloading JetBrainsMono Nerd Font (this may take a moment)..."
-    wget -q --show-progress https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -O /tmp/JetBrainsMono.zip
-
-    if [ -f /tmp/JetBrainsMono.zip ]; then
-        unzip -q /tmp/JetBrainsMono.zip -d /tmp/JetBrainsMono
-        find /tmp/JetBrainsMono -name "*.ttf" -exec cp {} "$FONT_DIR/" \;
-        rm -rf /tmp/JetBrainsMono /tmp/JetBrainsMono.zip
-        print_info "JetBrainsMono Nerd Font installed"
-    else
-        print_warning "Failed to download JetBrainsMono Nerd Font, skipping..."
-    fi
-else
-    print_info "JetBrainsMono Nerd Font already installed, skipping..."
-fi
-
-# Install Departure Mono
-print_info "Installing Departure Mono font..."
-if [ ! -f "$FONT_DIR/DepartureMono-Regular.otf" ]; then
-    # Get the actual download URL from GitHub API
-    DEPARTURE_URL=$(curl -s https://api.github.com/repos/rektdeckard/departure-mono/releases/latest | grep "browser_download_url.*zip" | cut -d '"' -f 4)
-
-    if [ -n "$DEPARTURE_URL" ]; then
-        wget -q "$DEPARTURE_URL" -O /tmp/DepartureMono.zip
-        if [ -f /tmp/DepartureMono.zip ]; then
-            unzip -q /tmp/DepartureMono.zip -d /tmp/DepartureMono
-            find /tmp/DepartureMono -name "*.otf" -exec cp {} "$FONT_DIR/" \; 2>/dev/null || \
-            find /tmp/DepartureMono -name "*.ttf" -exec cp {} "$FONT_DIR/" \; 2>/dev/null || true
-            rm -rf /tmp/DepartureMono /tmp/DepartureMono.zip
-            print_info "Departure Mono font installed"
-        else
-            print_warning "Failed to download Departure Mono, skipping..."
-        fi
-    else
-        print_warning "Could not find Departure Mono download URL, skipping..."
-    fi
-else
-    print_info "Departure Mono font already installed, skipping..."
-fi
-
-fc-cache -f
-
-# Install Catppuccin Mocha GTK theme
-print_info "Installing Catppuccin Mocha GTK theme..."
-THEME_DIR="$HOME/.themes"
-mkdir -p "$THEME_DIR"
-
-if [ ! -d "$THEME_DIR/catppuccin-mocha-mauve-standard+default" ]; then
-    print_info "Downloading Catppuccin GTK theme..."
-
-    # Clone the repository with submodules
-    if [ -d /tmp/catppuccin-gtk ]; then
-        rm -rf /tmp/catppuccin-gtk
-    fi
-
-    git clone --depth=1 https://github.com/catppuccin/gtk.git /tmp/catppuccin-gtk
-
-    if [ -d /tmp/catppuccin-gtk ]; then
-        cd /tmp/catppuccin-gtk
-
-        # Install dependencies for building
-        sudo apt install -y sassc
-
-        # Build and install Mocha variant with Mauve accent
-        python3 install.py mocha mauve --dest "$THEME_DIR"
-
-        cd "$SCRIPT_DIR"
-        rm -rf /tmp/catppuccin-gtk
-
-        print_info "Catppuccin Mocha GTK theme installed"
-    else
-        print_warning "Failed to clone Catppuccin GTK theme, skipping..."
-    fi
-else
-    print_info "Catppuccin Mocha GTK theme already installed, skipping..."
-fi
-
-# Install Starship prompt
-print_info "Installing Starship prompt..."
-if ! command -v starship &> /dev/null; then
-    curl -sS https://starship.rs/install.sh | sh -s -- -y
-    print_info "Starship installed successfully"
-else
-    print_info "Starship already installed, skipping..."
-fi
-
-# Create necessary directories
-print_info "Creating necessary directories..."
-mkdir -p "$HOME/Pictures/Screenshots"
-mkdir -p "$HOME/.config"
-
-# Backup existing configs
-print_info "Backing up existing configurations..."
-BACKUP_DIR="$HOME/.dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
-mkdir -p "$BACKUP_DIR"
-
-for file in .zshrc .zprofile .zshenv; do
-    if [ -f "$HOME/$file" ]; then
-        print_warning "Backing up existing $file to $BACKUP_DIR"
-        mv "$HOME/$file" "$BACKUP_DIR/"
-    fi
-done
-
-for dir in sway nvim qutebrowser htop kitty gtk-3.0 gtk-4.0; do
-    if [ -d "$HOME/.config/$dir" ]; then
-        print_warning "Backing up existing .config/$dir to $BACKUP_DIR"
-        mv "$HOME/.config/$dir" "$BACKUP_DIR/"
-    fi
-done
-
-# Copy dotfiles
-print_info "Installing dotfiles..."
+# Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-cp "$SCRIPT_DIR/.zshrc" "$HOME/"
-cp "$SCRIPT_DIR/.zprofile" "$HOME/"
-cp "$SCRIPT_DIR/.zshenv" "$HOME/"
+# Source libraries
+source "$SCRIPT_DIR/lib/common.sh"
+source "$SCRIPT_DIR/lib/package-manager.sh"
+source "$SCRIPT_DIR/lib/backup.sh"
+source "$SCRIPT_DIR/lib/state.sh"
 
-cp -r "$SCRIPT_DIR/.config"/* "$HOME/.config/"
+# Check prerequisites
+check_prerequisites() {
+    # Check if running on Debian
+    if ! command -v apt &> /dev/null; then
+        print_error "This script requires Debian/Ubuntu with apt package manager"
+        exit 1
+    fi
 
-# Make scripts executable
-chmod +x "$HOME/.config/sway/scripts/"*.sh
+    # Check if whiptail is available
+    if ! command -v whiptail &> /dev/null; then
+        print_error "whiptail is required but not installed. Installing..."
+        sudo apt update && sudo apt install -y whiptail
+    fi
+}
 
-# Configure GTK theme using gsettings for GNOME applications
-print_info "Configuring GTK theme and dark mode preference..."
-gsettings set org.gnome.desktop.interface gtk-theme 'catppuccin-mocha-mauve-standard+default'
-gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-print_info "GTK theme set to Catppuccin Mocha with dark mode"
+# Show welcome screen
+show_welcome() {
+    whiptail --title "uConsole Dotfiles Installer" \
+        --msgbox "Welcome to the uConsole Dotfiles Installation System\n\n\
+This installer will help you set up your uConsole with Sway and custom dotfiles.\n\n\
+You will be able to select which components to install.\n\n\
+Press OK to continue." 15 70
+}
 
-# Change default shell to zsh
-if [ "$SHELL" != "$(which zsh)" ]; then
-    print_info "Changing default shell to zsh..."
-    chsh -s "$(which zsh)"
-    print_info "Default shell changed to zsh. You'll need to log out and back in for this to take effect."
-fi
+# Show module selection menu
+select_modules() {
+    local selected=$(whiptail --title "Select Components" \
+        --checklist "Use SPACE to select/deselect, ARROW keys to navigate, ENTER to confirm:" \
+        20 78 9 \
+        "sway-core" "Sway/Wayland System - Window manager & core tools" ON \
+        "audio" "Audio System - PipeWire audio stack" ON \
+        "terminal-shell" "Terminal & Shell - Kitty, Zsh, Starship" ON \
+        "applications" "Applications - Wofi, Qutebrowser, Neovim, etc." ON \
+        "screenshots" "Screenshot Tools - Grim, Slurp, Grimshot" ON \
+        "fonts" "Fonts - Nerd Fonts, Departure Mono" ON \
+        "gtk-theme" "GTK Theme - Catppuccin Mocha" ON \
+        "dotfiles" "Dotfiles Deployment - Install config files" ON \
+        "services" "System Services - NetworkManager, Bluetooth" ON \
+        3>&1 1>&2 2>&3)
 
-# Configure system power button handling
-print_info "Configuring power button to use Sway instead of systemd..."
-sudo mkdir -p /etc/systemd/logind.conf.d
-sudo cp "$SCRIPT_DIR/etc/systemd/logind.conf.d/power-button.conf" /etc/systemd/logind.conf.d/
-print_info "Power button will now open power menu instead of shutting down immediately"
+    # Remove quotes from whiptail output
+    echo "$selected" | tr -d '"'
+}
 
-# Configure WiFi and Bluetooth
-print_info "Enabling and starting system services..."
-sudo systemctl enable --now NetworkManager
-sudo systemctl enable --now bluetooth
+# Resolve dependencies and sort modules in execution order
+# Fixed execution order: 01 -> 02 -> 03 -> 04 -> 05 -> 06 -> 07 -> 08 -> 09
+resolve_dependencies() {
+    local selected="$1"
+    local ordered=""
 
-# Restart logind to apply power button configuration
-print_info "Restarting systemd-logind to apply power button configuration..."
-sudo systemctl restart systemd-logind
+    # Define all modules in dependency order
+    local all_modules=("sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services")
 
-echo ""
-echo "=========================================="
-echo -e "${GREEN}Installation Complete!${NC}"
-echo "=========================================="
-echo ""
-echo "Next steps:"
-echo "1. Log out and log back in"
-echo "2. Start Sway by running: sway"
-echo "3. If you want Sway to start automatically on login, add this to your .zprofile:"
-echo "   if [ -z \"\$WAYLAND_DISPLAY\" ] && [ \"\$XDG_VTNR\" -eq 1 ]; then"
-echo "     exec sway"
-echo "   fi"
-echo ""
-echo "Key bindings:"
-echo "  Alt+Return     - Open terminal (kitty)"
-echo "  Alt+d          - Application launcher (wofi)"
-echo "  Alt+Shift+q    - Close window"
-echo "  Alt+Shift+c    - Reload Sway config"
-echo "  Alt+Shift+e    - Power menu (wofi)"
-echo "  Alt+p          - Screenshot mode"
-echo ""
-echo "Note: Your old configs have been backed up to: $BACKUP_DIR"
-echo ""
+    # Filter to include only selected modules in correct order
+    for module in "${all_modules[@]}"; do
+        if echo "$selected" | grep -q "$module"; then
+            ordered="$ordered $module"
+        fi
+    done
+
+    echo "$ordered"
+}
+
+# Calculate total estimated time
+calculate_total_time() {
+    local modules="$1"
+    local total=0
+
+    for module_id in $modules; do
+        # Source module to get estimate_time function
+        source "$SCRIPT_DIR/modules/"*"-${module_id}.sh"
+        local time=$(estimate_time)
+        total=$((total + time))
+    done
+
+    echo $total
+}
+
+# Show installation confirmation
+confirm_installation() {
+    local modules="$1"
+    local total_time=$(calculate_total_time "$modules")
+    local minutes=$((total_time / 60))
+    local seconds=$((total_time % 60))
+
+    local module_list=""
+    for module_id in $modules; do
+        # Source module to get metadata
+        source "$SCRIPT_DIR/modules/"*"-${module_id}.sh"
+        module_list="${module_list}✓ $MODULE_NAME\n"
+    done
+
+    whiptail --title "Confirm Installation" \
+        --yesno "The following components will be installed:\n\n${module_list}\nEstimated total time: ${minutes}m ${seconds}s\n\nContinue with installation?" 18 70
+}
+
+# Execute module installation
+execute_module() {
+    local module_id="$1"
+    local module_file=$(ls "$SCRIPT_DIR/modules/"*"-${module_id}.sh" 2>/dev/null | head -1)
+
+    if [ -z "$module_file" ]; then
+        print_error "Module file not found for: $module_id"
+        return 1
+    fi
+
+    # Source the module
+    source "$module_file"
+
+    # Check if already completed
+    if is_completed "$module_id"; then
+        print_info "Module '$MODULE_NAME' already completed, skipping..."
+        return 0
+    fi
+
+    # Execute installation
+    log_message "INFO" "Starting module: $MODULE_NAME"
+    if install_module; then
+        mark_completed "$module_id"
+        log_message "INFO" "Module '$MODULE_NAME' completed successfully"
+        return 0
+    else
+        mark_failed "$module_id" "Installation failed"
+        log_message "ERROR" "Module '$MODULE_NAME' failed"
+        return 1
+    fi
+}
+
+# Install selected modules
+install_modules() {
+    local modules="$1"
+    local total=$(echo "$modules" | wc -w)
+    local current=0
+    local failed_modules=""
+
+    for module_id in $modules; do
+        current=$((current + 1))
+        local percent=$((current * 100 / total))
+
+        # Source module for metadata
+        source "$SCRIPT_DIR/modules/"*"-${module_id}.sh"
+
+        # Execute module (output goes to terminal, not gauge)
+        if ! execute_module "$module_id"; then
+            failed_modules="$failed_modules $module_id"
+
+            # Ask user if they want to continue
+            if ! whiptail --title "Module Failed" \
+                --yesno "Module '$MODULE_NAME' failed to install.\n\nWould you like to continue with remaining modules?" 10 60; then
+                print_error "Installation aborted by user"
+                return 1
+            fi
+        fi
+    done
+
+    # Return failure if any modules failed
+    if [ -n "$failed_modules" ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+# Show final summary
+show_summary() {
+    local success=$1
+    local completed=$(get_completed_modules | wc -l)
+    local failed=$(get_failed_modules | wc -l)
+
+    local message="Installation Summary:\n\n"
+    message="${message}✓ Successfully installed: $completed modules\n"
+
+    if [ $failed -gt 0 ]; then
+        message="${message}✗ Failed: $failed modules\n"
+    fi
+
+    message="${message}\nLog file: .install-state/install.log\n\n"
+
+    if [ $success -eq 0 ]; then
+        message="${message}Next steps:\n"
+        message="${message}1. Log out and log back in\n"
+        message="${message}2. Start Sway by running: sway\n\n"
+        message="${message}Key bindings:\n"
+        message="${message}  Alt+Return  - Terminal\n"
+        message="${message}  Alt+d       - App launcher\n"
+        message="${message}  Alt+Shift+e - Power menu\n"
+    else
+        message="${message}Some modules failed. Check the log for details."
+    fi
+
+    whiptail --title "Installation Complete" --msgbox "$message" 22 70
+}
+
+# Check for previous installation state
+check_resume() {
+    if has_previous_state; then
+        local completed=$(get_completed_modules | tr '\n' ', ' | sed 's/,$//')
+        local failed=$(get_failed_modules | tr '\n' ', ' | sed 's/,$//')
+
+        local msg="A previous installation was detected.\n\n"
+        if [ -n "$completed" ]; then
+            msg="${msg}Completed: $completed\n\n"
+        fi
+        if [ -n "$failed" ]; then
+            msg="${msg}Failed: $failed\n\n"
+        fi
+        msg="${msg}Would you like to start fresh (this will clear previous state)?"
+
+        if whiptail --title "Previous Installation Detected" --yesno "$msg" 15 70; then
+            clear_state
+            return 1  # Start fresh
+        else
+            return 0  # Resume
+        fi
+    fi
+    return 1  # No previous state
+}
+
+# Main installation flow
+main() {
+    echo "=========================================="
+    echo "uConsole Dotfiles Installation Script"
+    echo "=========================================="
+    echo ""
+
+    # Check prerequisites
+    check_prerequisites
+
+    # Initialize state
+    init_state
+
+    # Check for resume
+    check_resume
+
+    # Show welcome
+    show_welcome
+
+    # Module selection
+    selected_modules=$(select_modules)
+
+    if [ -z "$selected_modules" ]; then
+        print_info "No modules selected. Exiting."
+        exit 0
+    fi
+
+    # Resolve dependencies and order
+    ordered_modules=$(resolve_dependencies "$selected_modules")
+
+    # Confirm installation
+    if ! confirm_installation "$ordered_modules"; then
+        print_info "Installation cancelled by user"
+        exit 0
+    fi
+
+    # Install modules
+    print_info "Starting installation..."
+    if install_modules "$ordered_modules"; then
+        show_summary 0
+    else
+        show_summary 1
+    fi
+
+    echo ""
+    print_success "Installation process completed"
+}
+
+# Run main
+main

@@ -36,7 +36,9 @@ This configuration provides a minimal, keyboard-focused environment optimized fo
 - Internet connection
 - sudo privileges
 
-### Quick Install
+### Interactive Installation (Recommended)
+
+The installer now features an interactive TUI (Text User Interface) that lets you choose which components to install:
 
 ```bash
 git clone https://github.com/yourusername/uconsole-dotfiles.git
@@ -45,13 +47,36 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installation script will:
+The interactive installer will:
 
-1. Install all required packages
-2. Back up your existing configurations
-3. Copy dotfiles to your home directory
-4. Configure system services (NetworkManager, Bluetooth)
-5. Change your default shell to zsh
+1. Show a welcome screen with instructions
+2. Let you select which components to install:
+   - Core Sway/Wayland System
+   - Audio System (PipeWire)
+   - Terminal & Shell (Kitty, Zsh, Starship)
+   - Applications & Utilities
+   - Screenshot Tools
+   - Fonts (Nerd Fonts, system fonts)
+   - GTK Theme (Catppuccin Mocha)
+   - Dotfiles Deployment
+   - System Services
+3. Automatically back up your existing configurations
+4. Install selected components in the correct dependency order
+5. Handle errors gracefully (option to continue or abort on failure)
+6. Resume interrupted installations automatically
+7. Show a summary with next steps
+
+All installations are logged to `.install-state/install.log` for troubleshooting.
+
+#### Modular Architecture
+
+The installer is now organized into independent modules located in the `modules/` directory:
+- Each module can be installed independently through the TUI
+- Dependencies are automatically resolved
+- Failed modules don't stop the entire installation
+- You can resume interrupted installations
+
+The old monolithic installer is preserved as `install.sh.backup`.
 
 ### Manual Installation
 
