@@ -6,14 +6,21 @@
 
 # Source common utilities (assumes common.sh is already sourced by caller)
 
-# State directory
-STATE_DIR="$(get_script_dir)/.install-state"
-COMPLETED_FILE="$STATE_DIR/completed.txt"
-FAILED_FILE="$STATE_DIR/failed.txt"
-LOG_FILE="$STATE_DIR/install.log"
+# State directory (use SCRIPT_DIR from install.sh)
+# Note: These are set in init_state() to avoid calling functions at source time
+STATE_DIR=""
+COMPLETED_FILE=""
+FAILED_FILE=""
+LOG_FILE=""
 
 # Initialize state directory
 init_state() {
+    # Set state directory paths (using SCRIPT_DIR from install.sh)
+    STATE_DIR="$SCRIPT_DIR/.install-state"
+    COMPLETED_FILE="$STATE_DIR/completed.txt"
+    FAILED_FILE="$STATE_DIR/failed.txt"
+    LOG_FILE="$STATE_DIR/install.log"
+
     if [ ! -d "$STATE_DIR" ]; then
         mkdir -p "$STATE_DIR"
         touch "$COMPLETED_FILE"

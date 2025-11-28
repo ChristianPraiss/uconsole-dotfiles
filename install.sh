@@ -226,12 +226,10 @@ check_resume() {
 
         if whiptail --title "Previous Installation Detected" --yesno "$msg" 15 70; then
             clear_state
-            return 1  # Start fresh
-        else
-            return 0  # Resume
         fi
     fi
-    return 1  # No previous state
+    # Always return 0 to avoid exiting with set -e
+    return 0
 }
 
 # Main installation flow
