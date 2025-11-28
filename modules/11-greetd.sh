@@ -17,12 +17,49 @@ MODULE_DEPENDENCIES=("sway-core")
 install_module() {
     print_info "Installing ${MODULE_NAME}..."
 
-    # Install greetd and tuigreet
-    print_info "Installing greetd and greetd-tuigreet..."
-    if ! apt_install greetd greetd-tuigreet; then
-        print_error "Failed to install greetd packages"
+    # Install greetd from apt
+    print_info "Installing greetd..."
+    if ! apt_install greetd; then
+        print_error "Failed to install greetd"
         return 1
     fi
+
+    # Install tuigreet from GitHub releases (not available in Debian repos)
+    print_info "Installing tuigreet from GitHub releases..."
+
+    # Detect architecture
+    local arch=$(dpkg --print-architecture)
+    if [ "$arch" = "armhf" ]; then
+        local tuigreet_arch="armv7-unknown-linux-gnueabihf"
+    elif [ "$arch" = "arm64" ]; then
+        local tuigreet_arch="aarch64-unknown-linux-gnu"
+    elif [ "$arch" = "amd64" ]; then
+        local tuigreet_arch="x86_64-unknown-linux-gnu"
+    else
+        print_error "Unsupported architecture: $arch"
+        return 1
+    fi
+
+    # Get latest release version
+    local version="0.9.1"  # Known stable version
+    local download_url="https://github.com/apognu/tuigreet/releases/download/${version}/tuigreet-${version}-${tuigreet_arch}"
+
+    print_info "Downloading tuigreet binary..."
+    if ! sudo wget -q --show-progress -O /usr/local/bin/tuigreet "$download_url"; then
+        print_error "Failed to download tuigreet"
+        return 1
+    fi
+
+    # Make it executable
+    sudo chmod +x /usr/local/bin/tuigreet
+
+    # Verify installation
+    if [ ! -x /usr/local/bin/tuigreet ]; then
+        print_error "tuigreet binary is not executable"
+        return 1
+    fi
+
+    print_success "tuigreet installed successfully"
 
     # Backup existing greetd configuration if it exists
     if [ -f /etc/greetd/config.toml ]; then
@@ -71,8 +108,8 @@ EOF
 
 # Check if module is already installed
 check_installed() {
-    # Check if greetd service is enabled
-    if systemctl is-enabled greetd &>/dev/null; then
+    # Check if greetd service is enabled and tuigreet binary exists
+    if systemctl is-enabled greetd &>/dev/null && [ -x /usr/local/bin/tuigreet ]; then
         return 0
     else
         return 1
@@ -81,7 +118,7 @@ check_installed() {
 
 # Estimate installation time (seconds)
 estimate_time() {
-    echo "60"  # ~1 minute (much faster than SDDM, minimal packages)
+    echo "90"  # ~1.5 minutes (greetd package + tuigreet binary download)
 }
 
 # Prevent direct execution
