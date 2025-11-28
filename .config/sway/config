@@ -52,6 +52,9 @@ seat * hide_cursor 5000
     # Run wofi with power options
     bindsym $mod+Shift+e exec $HOME/.config/sway/scripts/power.sh
 
+    # Power button opens power menu instead of shutting down immediately
+    bindsym XF86PowerOff exec $HOME/.config/sway/scripts/power.sh
+
 
 include config.d/navigation
 include config.d/screenshot

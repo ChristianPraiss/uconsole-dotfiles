@@ -26,6 +26,7 @@ This configuration provides a minimal, keyboard-focused environment optimized fo
 - Gruvbox color scheme throughout
 - Optimized for keyboard-only workflow
 - Power management with auto-sleep after 60 seconds
+- Safe power button - opens menu instead of instant shutdown
 
 ## Installation
 
@@ -127,6 +128,7 @@ To start Sway automatically on login, the install script suggests adding auto-st
 | `Alt+Shift+q` | Kill focused window |
 | `Alt+Shift+c` | Reload Sway configuration |
 | `Alt+Shift+e` | Power menu (wofi - shutdown/restart/logout) |
+| `Power Button` | Power menu (safer than instant shutdown) |
 
 #### Window Management
 
