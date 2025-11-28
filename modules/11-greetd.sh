@@ -24,34 +24,44 @@ install_module() {
         return 1
     fi
 
-    # Install tuigreet from GitHub releases (not available in Debian repos)
-    print_info "Installing tuigreet from GitHub releases..."
-
-    # Detect architecture
-    local arch=$(dpkg --print-architecture)
-    if [ "$arch" = "armhf" ]; then
-        local tuigreet_arch="armv7-unknown-linux-gnueabihf"
-    elif [ "$arch" = "arm64" ]; then
-        local tuigreet_arch="aarch64-unknown-linux-gnu"
-    elif [ "$arch" = "amd64" ]; then
-        local tuigreet_arch="x86_64-unknown-linux-gnu"
-    else
-        print_error "Unsupported architecture: $arch"
+    # Install build dependencies for tuigreet
+    print_info "Installing Rust toolchain and build dependencies..."
+    if ! apt_install cargo rustc git pkg-config libpam0g-dev; then
+        print_error "Failed to install build dependencies"
         return 1
     fi
 
-    # Get latest release version
-    local version="0.9.1"  # Known stable version
-    local download_url="https://github.com/apognu/tuigreet/releases/download/${version}/tuigreet-${version}-${tuigreet_arch}"
-
-    print_info "Downloading tuigreet binary..."
-    if ! sudo wget -q --show-progress -O /usr/local/bin/tuigreet "$download_url"; then
-        print_error "Failed to download tuigreet"
+    # Clone tuigreet repository
+    print_info "Cloning tuigreet from GitHub..."
+    local build_dir="/tmp/tuigreet-build-$$"
+    if ! git clone https://github.com/apognu/tuigreet.git "$build_dir"; then
+        print_error "Failed to clone tuigreet repository"
         return 1
     fi
 
-    # Make it executable
-    sudo chmod +x /usr/local/bin/tuigreet
+    # Build tuigreet from source
+    print_info "Compiling tuigreet (this may take several minutes)..."
+    cd "$build_dir" || return 1
+
+    if ! cargo build --release; then
+        print_error "Failed to compile tuigreet"
+        cd -
+        rm -rf "$build_dir"
+        return 1
+    fi
+
+    # Install compiled binary
+    print_info "Installing tuigreet binary..."
+    if ! sudo install -m 755 target/release/tuigreet /usr/local/bin/tuigreet; then
+        print_error "Failed to install tuigreet binary"
+        cd -
+        rm -rf "$build_dir"
+        return 1
+    fi
+
+    # Cleanup build directory
+    cd -
+    rm -rf "$build_dir"
 
     # Verify installation
     if [ ! -x /usr/local/bin/tuigreet ]; then
@@ -59,7 +69,7 @@ install_module() {
         return 1
     fi
 
-    print_success "tuigreet installed successfully"
+    print_success "tuigreet compiled and installed successfully"
 
     # Backup existing greetd configuration if it exists
     if [ -f /etc/greetd/config.toml ]; then
@@ -118,7 +128,7 @@ check_installed() {
 
 # Estimate installation time (seconds)
 estimate_time() {
-    echo "90"  # ~1.5 minutes (greetd package + tuigreet binary download)
+    echo "600"  # ~10 minutes (greetd package + Rust toolchain + tuigreet compilation)
 }
 
 # Prevent direct execution
