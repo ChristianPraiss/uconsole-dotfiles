@@ -146,7 +146,7 @@ print_info "Installing Catppuccin Mocha GTK theme..."
 THEME_DIR="$HOME/.themes"
 mkdir -p "$THEME_DIR"
 
-if [ ! -d "$THEME_DIR/Catppuccin-Mocha-Standard-Mauve-Dark" ]; then
+if [ ! -d "$THEME_DIR/catppuccin-mocha-mauve-standard+default" ]; then
     print_info "Downloading Catppuccin GTK theme..."
 
     # Clone the repository with submodules
@@ -163,7 +163,7 @@ if [ ! -d "$THEME_DIR/Catppuccin-Mocha-Standard-Mauve-Dark" ]; then
         sudo apt install -y sassc
 
         # Build and install Mocha variant with Mauve accent
-        python3 install.py mocha -a mauve -s standard -d "$THEME_DIR"
+        python3 install.py mocha mauve --dest "$THEME_DIR"
 
         cd "$SCRIPT_DIR"
         rm -rf /tmp/catppuccin-gtk
