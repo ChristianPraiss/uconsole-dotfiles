@@ -81,7 +81,7 @@ Modules are numbered to enforce dependency order:
 8. `08-dotfiles.sh` - Deploy dotfiles to home directory
 9. `09-services.sh` - Enable NetworkManager, Bluetooth
 10. `10-notifications.sh` - SwayNC notification center with Catppuccin
-11. `11-sddm.sh` - SDDM display manager with Catppuccin Mocha theme
+11. `11-greetd.sh` - greetd display manager with tuigreet TUI greeter
 
 The installer resolves and executes modules in this fixed order regardless of selection order.
 
@@ -196,30 +196,30 @@ View installation logs:
 cat .install-state/install.log
 ```
 
-## Display Manager (SDDM)
+## Display Manager (greetd)
 
-Module 11 installs and configures SDDM display manager:
+Module 11 installs and configures greetd display manager with tuigreet:
 
-**Theme**: Catppuccin Mocha (matches GTK theme from module 07)
-- Downloaded from: https://github.com/catppuccin/sddm/releases/latest
-- Installed to: `/usr/share/sddm/themes/catppuccin-mocha/`
+**Why greetd?** Minimal, Rust-based display manager designed specifically for Wayland compositors like Sway. Unlike SDDM, it doesn't pull in KDE/Qt dependencies.
 
-**Configuration** (`/etc/sddm.conf.d/theme.conf`):
-- Display server: Wayland (not X11, per Catppuccin requirements)
-- Default session: Sway
-- Theme: catppuccin-mocha
+**Greeter**: tuigreet - Terminal UI greeter
+- Minimal resource usage (ideal for battery-powered uConsole)
+- Shows time, remembers last user and session
+- Native Wayland support
 
-**Session File** (`/usr/share/wayland-sessions/sway.desktop`):
-- Defines Sway as a valid Wayland session for SDDM
+**Configuration** (`/etc/greetd/config.toml`):
+- Default command: `tuigreet --time --remember --remember-session --cmd sway`
+- Runs on VT1
+- User: `greeter`
 
-**Important**: SDDM service is enabled but not started during installation (to avoid killing the current session). A reboot is required after installation.
+**Important**: greetd service is enabled but not started during installation (to avoid killing the current session). A reboot is required after installation.
 
 ## Color Scheme
 
 The configuration uses Catppuccin color scheme throughout:
 - Sway window borders: Catppuccin Mocha colors
 - GTK Theme: Catppuccin Mocha (module 07)
-- SDDM Login: Catppuccin Mocha (module 11)
+- Login Screen: tuigreet TUI (module 11)
 - Notifications: Catppuccin Mocha (module 10)
 - Wallpaper: ClockworkPi logo on dark background
 

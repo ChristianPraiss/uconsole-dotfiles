@@ -56,7 +56,7 @@ select_modules() {
         "dotfiles" "Dotfiles Deployment - Install config files" ON \
         "services" "System Services - NetworkManager, Bluetooth" ON \
         "notifications" "Notification Center - SwayNC with Catppuccin" ON \
-        "sddm" "Display Manager - SDDM with Catppuccin Mocha" ON \
+        "greetd" "Display Manager - greetd with tuigreet" ON \
         3>&1 1>&2 2>&3)
 
     # Remove quotes from whiptail output
@@ -70,7 +70,7 @@ resolve_dependencies() {
     local ordered=""
 
     # Define all modules in dependency order
-    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "sddm")
+    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "greetd")
 
     # Filter to include only selected modules in correct order
     for module in "${all_modules[@]}"; do

@@ -30,7 +30,7 @@ install_module() {
     # Download Catppuccin Mocha theme
     print_info "Downloading Catppuccin Mocha theme..."
     if ! wget -q -O "$HOME/.config/swaync/style.css" \
-        https://github.com/catppuccin/swaync/releases/latest/download/mocha.css; then
+        https://github.com/catppuccin/swaync/releases/latest/download/catppuccin-mocha.css; then
         print_error "Failed to download Catppuccin Mocha theme"
         return 1
     fi
