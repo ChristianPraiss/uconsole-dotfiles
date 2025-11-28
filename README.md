@@ -10,11 +10,12 @@ This configuration provides a minimal, keyboard-focused environment optimized fo
 
 - **Sway** - Tiling Wayland compositor with uConsole-specific settings
 - **Foot** - Fast, lightweight terminal emulator
-- **Tofi** - Application launcher
-- **Neovim** - LazyVim-based editor configuration
+- **Kitty** - Alternative terminal emulator
+- **Wofi** - Application launcher and power menu
+- **Neovim** - Custom editor configuration
 - **Qutebrowser** - Keyboard-driven web browser
 - **Ranger** - Terminal file manager with devicons
-- **Zsh** - Shell with Oh My Zsh and Powerlevel10k theme
+- **Zsh** - Minimal shell configuration
 - **htop** - System monitor
 
 ### Key Features
@@ -47,12 +48,10 @@ chmod +x install.sh
 The installation script will:
 
 1. Install all required packages
-2. Set up Oh My Zsh with Powerlevel10k theme
-3. Install Nerd Fonts for icon support
-4. Back up your existing configurations
-5. Copy dotfiles to your home directory
-6. Configure system services (WiFi, Bluetooth)
-7. Change your default shell to zsh
+2. Back up your existing configurations
+3. Copy dotfiles to your home directory
+4. Configure system services (NetworkManager, Bluetooth)
+5. Change your default shell to zsh
 
 ### Manual Installation
 
@@ -65,48 +64,45 @@ sudo apt update
 sudo apt install -y \
     sway swayidle swaylock swaybg \
     foot zsh git curl wget \
-    tofi qutebrowser ranger neovim htop \
-    brightnessctl alsa-utils bluez iwd \
+    wofi qutebrowser ranger neovim htop \
+    brightnessctl alsa-utils bluez network-manager \
     grim slurp jq wl-clipboard \
     fonts-terminus fonts-font-awesome fonts-noto
 ```
 
-#### 2. Install Oh My Zsh and Powerlevel10k
+#### 2. Copy Dotfiles
 
 ```bash
-# Install Oh My Zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-
-# Install Powerlevel10k theme
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
-    ~/.oh-my-zsh/custom/themes/powerlevel10k
-```
-
-#### 3. Install Nerd Fonts
-
-```bash
-mkdir -p ~/.local/share/fonts
-cd ~/.local/share/fonts
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
-wget https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
-fc-cache -f
-```
-
-#### 4. Copy Dotfiles
-
-```bash
-cp .zshrc .zprofile .zshenv .p10k.zsh ~/
+cp .zshrc .zprofile .zshenv ~/
 cp -r .config/* ~/.config/
 chmod +x ~/.config/sway/scripts/*.sh
 ```
 
-#### 5. Set Zsh as Default Shell
+#### 3. Set Zsh as Default Shell
 
 ```bash
 chsh -s $(which zsh)
 ```
+
+### Updating Dotfiles
+
+If you've already installed everything and just want to update your dotfiles (without reinstalling packages), use the update script:
+
+```bash
+cd uconsole-dotfiles
+git pull  # Get latest changes from repository
+./update.sh
+```
+
+The update script will:
+- Back up your current configs to `~/.dotfiles_backup_<timestamp>`
+- Copy updated dotfiles to your home directory
+- Make scripts executable
+- Skip all package installation and system configuration
+
+After updating:
+- For Sway changes: Press `Alt+Shift+c` to reload
+- For shell changes: Open a new terminal or run `source ~/.zshrc`
 
 ## Usage
 
@@ -127,10 +123,10 @@ To start Sway automatically on login, the install script suggests adding auto-st
 | Key Binding | Action |
 |------------|---------|
 | `Alt+Return` | Open terminal (foot) |
-| `Alt+d` | Application launcher (tofi) |
+| `Alt+d` | Application launcher (wofi) |
 | `Alt+Shift+q` | Kill focused window |
 | `Alt+Shift+c` | Reload Sway configuration |
-| `Alt+Shift+e` | Power menu (shutdown/restart/logout) |
+| `Alt+Shift+e` | Power menu (wofi - shutdown/restart/logout) |
 
 #### Window Management
 
@@ -168,14 +164,16 @@ Screenshots are saved to `~/Pictures/Screenshots/`
 
 The custom status bar shows:
 
-- Bluetooth status
-- WiFi status
+- Bluetooth status (via `hciconfig`)
+- WiFi status (via NetworkManager/`nmcli`)
 - Screen brightness level
-- Volume level
+- Volume level (via `amixer`)
 - Battery percentage and charging status
 - Date and time
 
 The status bar script is located at `.config/sway/scripts/swaybar.sh`
+
+**Note**: The status bar requires NetworkManager to be running for WiFi status display.
 
 ## Configuration Files
 
@@ -192,15 +190,15 @@ The status bar script is located at `.config/sway/scripts/swaybar.sh`
 - `.zshrc` - Main zsh configuration
 - `.zshenv` - Environment variables
 - `.zprofile` - Login shell configuration
-- `.p10k.zsh` - Powerlevel10k theme configuration
 
 ### Applications
 
-- Neovim: `.config/nvim/` (LazyVim-based setup)
+- Neovim: `.config/nvim/` - Custom setup
 - Foot terminal: `.config/foot/foot.ini`
+- Kitty terminal: `.config/kitty/kitty.conf`
 - Ranger: `.config/ranger/rc.conf`
 - Qutebrowser: `.config/qutebrowser/config.py`
-- Tofi launcher: `.config/tofi/config`
+- Starship: `.config/starship.toml` (optional prompt)
 - htop: `.config/htop/htoprc`
 
 ## Customization
@@ -210,7 +208,7 @@ The status bar script is located at `.config/sway/scripts/swaybar.sh`
 Edit `.config/sway/config` and modify line 25:
 
 ```
-output * bg $HOME/.config/sway/tsutsugou.png center #111111
+output * bg $HOME/.config/sway/clockworkpi_logo.png center #111111
 ```
 
 Replace `tsutsugou.png` with your own image.
@@ -245,25 +243,43 @@ font Terminus Bold 20
 
 ### Status Bar Not Showing Information
 
-The status bar relies on uConsole-specific hardware paths:
+The status bar relies on uConsole-specific hardware paths and system tools:
 
 - Battery: `/sys/class/power_supply/axp20x-battery/`
 - Brightness: `/sys/class/backlight/backlight@0/`
+- WiFi: Requires NetworkManager (`nmcli` command)
+- Bluetooth: Requires `hciconfig` (from bluez-utils or bluez)
+- Audio: Requires `amixer` (from alsa-utils)
 
-If these paths differ on your system, edit `.config/sway/scripts/swaybar.sh`
+If hardware paths differ on your system, edit `.config/sway/scripts/swaybar.sh`
+
+If WiFi icon doesn't show:
+```bash
+# Make sure NetworkManager is running
+sudo systemctl status NetworkManager
+
+# Test nmcli command
+nmcli radio wifi
+nmcli general status
+```
 
 ### WiFi or Bluetooth Not Working
 
 Enable the services:
 
 ```bash
-sudo systemctl enable --now iwd
+sudo systemctl enable --now NetworkManager
 sudo systemctl enable --now bluetooth
 ```
 
-### Icons Not Showing in Terminal
+Connect to WiFi using nmcli or nmtui:
 
-Make sure you installed a Nerd Font and it's being used by your terminal. For foot, check `.config/foot/foot.ini`
+```bash
+nmtui  # Text-based UI
+# or
+nmcli device wifi list
+nmcli device wifi connect "YourNetworkName" password "YourPassword"
+```
 
 ### Neovim Plugins Not Loading
 
@@ -280,7 +296,7 @@ nvim --headless "+Lazy! sync" +qa
 - sway, swayidle, swaylock, swaybg
 - foot
 - zsh, git, curl, wget
-- tofi
+- wofi
 - qutebrowser
 - ranger
 - neovim
@@ -288,16 +304,27 @@ nvim --headless "+Lazy! sync" +qa
 - brightnessctl
 - alsa-utils
 - bluez
-- iwd
+- network-manager
 - grim, slurp, jq
 - wl-clipboard
 
-### Optional Packages
+### Fonts
 
+The installation script automatically installs:
+- JetBrainsMono Nerd Font
+- Departure Mono
 - fonts-terminus
 - fonts-font-awesome
 - fonts-noto
-- A Nerd Font (MesloLGS recommended)
+
+### Additional Tools
+
+The installation script also installs:
+- **Starship** - Cross-shell prompt (configured via `.config/starship.toml`)
+
+### Optional Packages
+
+- kitty (alternative terminal)
 
 ## Hardware-Specific Notes
 
@@ -324,8 +351,7 @@ Feel free to use and modify these dotfiles for your own setup.
 ## Credits
 
 - Sway configuration inspired by the default Sway config
-- Neovim setup based on [LazyVim](https://www.lazyvim.org/)
-- Powerlevel10k theme by [romkatv](https://github.com/romkatv/powerlevel10k)
+- Neovim custom configuration
 - Ranger devicons plugin
 
 ## Contributing

@@ -2,11 +2,7 @@
 
 ACTION=$(
 	echo -e '󰤆  Shutdown\n󰑓  Restart\n󰗽  Logout' \
-		| tofi \
-			--width 22% \
-			--height 23% \
-			--padding-bottom=4% \
-			--prompt-text '󰨃   '
+		| wofi --dmenu --prompt "Power Menu"
 )
 
 case "$ACTION" in

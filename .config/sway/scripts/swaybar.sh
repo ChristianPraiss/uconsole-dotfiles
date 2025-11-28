@@ -49,30 +49,27 @@ bluetooth_icon() {
 }
 
 wifi_icon() {
-	WIFI_IWD_NTERFACE='/net/connman/iwd/0/2'
-	IS_WIFI_POWERED=$(
-		busctl get-property \
-			net.connman.iwd \
-			$WIFI_IWD_NTERFACE \
-			net.connman.iwd.Device \
-			Powered \
-		| cut -d' ' -f2
-	)
-	WIFI_STATION_STATE=$(
-		busctl get-property \
-			net.connman.iwd \
-			$WIFI_IWD_NTERFACE \
-			net.connman.iwd.Station \
-			State \
-		| cut -d' ' -f2
+	# Check if NetworkManager is running
+	if ! systemctl is-active --quiet NetworkManager; then
+		echo '󰖪'  # WiFi off icon
+		return
+	fi
 
-	)
-	if [ "$IS_WIFI_POWERED" == "true" ]; then
-		if [ "$WIFI_STATION_STATE" == '"connected"' ]; then echo '󰖩';
-		else echo '󱛅';
-		fi
+	# Get WiFi radio state (enabled/disabled)
+	WIFI_ENABLED=$(nmcli radio wifi 2>/dev/null)
+
+	if [ "$WIFI_ENABLED" != "enabled" ]; then
+		echo '󰖪'  # WiFi off icon
+		return
+	fi
+
+	# Check connection state
+	WIFI_STATE=$(nmcli -t -f STATE general 2>/dev/null)
+
+	if [ "$WIFI_STATE" == "connected (site only)" ] || [ "$WIFI_STATE" == "connected (local only)" ] || [ "$WIFI_STATE" == "connected" ]; then
+		echo '󰖩'  # WiFi connected icon
 	else
-		echo '󰖪';
+		echo '󱛅'  # WiFi disconnected icon
 	fi
 }
 

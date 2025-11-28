@@ -19,11 +19,10 @@ chmod +x install.sh
 
 The script will:
 - Install all required packages via apt
-- Set up Oh My Zsh and Powerlevel10k
 - Install fonts
 - Back up existing configs to `~/.dotfiles_backup_<timestamp>`
 - Copy all dotfiles to your home directory
-- Enable system services (WiFi, Bluetooth)
+- Enable system services (NetworkManager, Bluetooth)
 - Change your default shell to zsh
 
 ### Step 3: Log Out and Back In
@@ -61,30 +60,29 @@ fi
 ### System Packages (via apt)
 - **Sway ecosystem**: sway, swayidle, swaylock, swaybg, wl-clipboard
 - **Terminal**: foot, zsh
-- **Applications**: tofi, qutebrowser, ranger, neovim, htop
-- **Utilities**: brightnessctl, alsa-utils, bluez, iwd, grim, slurp, jq, git
+- **Applications**: wofi, qutebrowser, ranger, neovim, htop
+- **Utilities**: brightnessctl, alsa-utils, bluez, network-manager, grim, slurp, jq, git
 - **Fonts**: fonts-terminus, fonts-font-awesome, fonts-noto
 
 ### Additional Installations
-- **Oh My Zsh** - ZSH framework
-- **Powerlevel10k** - ZSH theme with pretty icons
-- **MesloLGS Nerd Font** - Font with icon support
 - **Grimshot** - Screenshot utility for Sway
+- **JetBrainsMono Nerd Font** - Font with icon support
+- **Departure Mono** - Monospace font
+- **Starship** - Cross-shell prompt
 
 ### Dotfiles Installed
-- Shell config: `.zshrc`, `.zprofile`, `.zshenv`, `.p10k.zsh`
+- Shell config: `.zshrc`, `.zprofile`, `.zshenv`
 - Sway config: `.config/sway/`
-- App configs: `.config/foot/`, `.config/nvim/`, `.config/ranger/`, etc.
+- App configs: `.config/foot/`, `.config/nvim/`, `.config/ranger/`, `.config/kitty/`, etc.
 
 ## Disk Space Requirements
 
 Approximate disk space needed:
 - Base packages: ~500 MB
 - Fonts: ~50 MB
-- Oh My Zsh + Powerlevel10k: ~20 MB
 - Neovim plugins (installed on first run): ~100 MB
 
-**Total: ~700 MB** (excluding Neovim plugins)
+**Total: ~650 MB** (excluding Neovim plugins)
 
 ## First Launch Checklist
 
@@ -120,7 +118,7 @@ Or run with debug output:
 sway -d 2>&1 | tee sway-debug.log
 ```
 
-### Status bar shows wrong battery/brightness info
+### Status bar shows wrong battery/brightness info or WiFi not showing
 
 The paths might be different on your system. Edit:
 ```bash
@@ -131,15 +129,27 @@ And check the paths:
 - Battery: `/sys/class/power_supply/axp20x-battery/`
 - Brightness: `/sys/class/backlight/backlight@0/`
 
+For WiFi status, make sure NetworkManager is running:
+```bash
+sudo systemctl status NetworkManager
+nmcli general status
+```
+
 ### WiFi not working
 
-Enable and start iwd service:
+Enable and start NetworkManager service:
 ```bash
-sudo systemctl enable --now iwd
-iwctl device list
-iwctl station wlan0 scan
-iwctl station wlan0 get-networks
-iwctl station wlan0 connect "YourNetworkName"
+sudo systemctl enable --now NetworkManager
+```
+
+Connect to WiFi using nmcli or nmtui:
+```bash
+# Interactive text UI (easier)
+nmtui
+
+# Or command line
+nmcli device wifi list
+nmcli device wifi connect "YourNetworkName" password "YourPassword"
 ```
 
 ### Shell didn't change to zsh
@@ -150,6 +160,34 @@ chsh -s $(which zsh)
 ```
 
 Then log out and back in.
+
+### Volume keys not working
+
+The uConsole volume keys should work with the XF86Audio keycodes. If they're not working:
+
+1. Test if ALSA detects your keys:
+```bash
+# Install alsa-utils if not already installed
+sudo apt install alsa-utils
+
+# Test volume control manually
+amixer set Master 5%+
+amixer set Master 5%-
+```
+
+2. If manual commands work but keys don't, the keys might not be mapped correctly. Install `wev` to check what keys are being sent:
+```bash
+sudo apt install wev
+wev  # Press your volume keys and check output
+```
+
+3. If the keys show different codes, update `.config/sway/config.d/media` with the correct key codes.
+
+4. Make sure your audio device is not muted:
+```bash
+amixer sget Master
+# Look for [on] or [off] in the output
+```
 
 ## Rolling Back
 
