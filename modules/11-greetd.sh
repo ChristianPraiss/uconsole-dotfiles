@@ -119,7 +119,7 @@ install_module() {
 vt = 1
 
 [default_session]
-command = "tuigreet --time --remember --remember-session --cmd sway"
+command = "/usr/local/bin/tuigreet --time --remember --remember-session --cmd sway"
 user = "greeter"
 EOF
         print_success "greetd configuration created"
