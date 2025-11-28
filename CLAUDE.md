@@ -13,7 +13,7 @@ This is a dotfiles configuration repository for the ClockworkPi uConsole running
 The installer follows a modular architecture where each component is an independent, self-contained module:
 
 - **Main Script**: `install.sh` - Interactive TUI installer using whiptail
-- **Modules**: `modules/XX-name.sh` - Individual installation modules numbered for dependency order (01-09)
+- **Modules**: `modules/XX-name.sh` - Individual installation modules numbered for dependency order (00-11)
 - **Libraries**: `lib/*.sh` - Shared utilities sourced by modules and main installer
 
 **Critical**: Module scripts assume libraries are already sourced by the caller (install.sh). Never source libraries within modules. Libraries are sourced once at the top level in install.sh:
@@ -70,15 +70,18 @@ fi
 ### Module Execution Order
 
 Modules are numbered to enforce dependency order:
+0. `00-system-tweaks.sh` - System optimization (quiet console, disable cloud-init)
 1. `01-sway-core.sh` - Core Sway/Wayland system (no dependencies)
 2. `02-audio.sh` - PipeWire audio stack
 3. `03-terminal-shell.sh` - Kitty, Zsh, Starship
 4. `04-applications.sh` - Wofi, Qutebrowser, Neovim, Nautilus, htop
 5. `05-screenshots.sh` - Grim, Slurp, Grimshot
 6. `06-fonts.sh` - Nerd Fonts installation
-7. `07-gtk-theme.sh` - Catppuccin Mocha theme
+7. `07-gtk-theme.sh` - Catppuccin Mocha GTK theme
 8. `08-dotfiles.sh` - Deploy dotfiles to home directory
 9. `09-services.sh` - Enable NetworkManager, Bluetooth
+10. `10-notifications.sh` - SwayNC notification center with Catppuccin
+11. `11-sddm.sh` - SDDM display manager with Catppuccin Mocha theme
 
 The installer resolves and executes modules in this fixed order regardless of selection order.
 
@@ -193,11 +196,31 @@ View installation logs:
 cat .install-state/install.log
 ```
 
+## Display Manager (SDDM)
+
+Module 11 installs and configures SDDM display manager:
+
+**Theme**: Catppuccin Mocha (matches GTK theme from module 07)
+- Downloaded from: https://github.com/catppuccin/sddm/releases/latest
+- Installed to: `/usr/share/sddm/themes/catppuccin-mocha/`
+
+**Configuration** (`/etc/sddm.conf.d/theme.conf`):
+- Display server: Wayland (not X11, per Catppuccin requirements)
+- Default session: Sway
+- Theme: catppuccin-mocha
+
+**Session File** (`/usr/share/wayland-sessions/sway.desktop`):
+- Defines Sway as a valid Wayland session for SDDM
+
+**Important**: SDDM service is enabled but not started during installation (to avoid killing the current session). A reboot is required after installation.
+
 ## Color Scheme
 
-The configuration uses Gruvbox/Catppuccin color scheme throughout:
+The configuration uses Catppuccin color scheme throughout:
 - Sway window borders: Catppuccin Mocha colors
 - GTK Theme: Catppuccin Mocha (module 07)
+- SDDM Login: Catppuccin Mocha (module 11)
+- Notifications: Catppuccin Mocha (module 10)
 - Wallpaper: ClockworkPi logo on dark background
 
 ## Common Pitfalls

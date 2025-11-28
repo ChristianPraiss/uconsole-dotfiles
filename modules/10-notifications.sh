@@ -17,9 +17,9 @@ MODULE_DEPENDENCIES=("sway-core")
 install_module() {
     print_info "Installing ${MODULE_NAME}..."
 
-    # Install swaync package
-    if ! apt_install "swaync"; then
-        print_error "Failed to install swaync"
+    # Install sway-notification-center package
+    if ! apt_install "sway-notification-center"; then
+        print_error "Failed to install sway-notification-center"
         return 1
     fi
 
@@ -60,8 +60,8 @@ install_module() {
 
 # Check if module is already installed
 check_installed() {
-    # Check if swaync package is installed
-    if apt_check_installed "swaync"; then
+    # Check if sway-notification-center package is installed
+    if apt_check_installed "sway-notification-center"; then
         return 0
     else
         return 1
