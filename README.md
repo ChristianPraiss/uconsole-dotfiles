@@ -168,7 +168,7 @@ The custom status bar shows:
 - Bluetooth status (via `hciconfig`)
 - WiFi status (via NetworkManager/`nmcli`)
 - Screen brightness level
-- Volume level (via `amixer`)
+- Volume level (via `wpctl`)
 - Battery percentage and charging status
 - Date and time
 
@@ -248,7 +248,7 @@ The status bar relies on uConsole-specific hardware paths and system tools:
 - Brightness: `/sys/class/backlight/backlight@0/`
 - WiFi: Requires NetworkManager (`nmcli` command)
 - Bluetooth: Requires `hciconfig` (from bluez-utils or bluez)
-- Audio: Requires `amixer` (from alsa-utils)
+- Audio: Requires `wpctl` (from wireplumber/pipewire)
 
 If hardware paths differ on your system, edit `.config/sway/scripts/swaybar.sh`
 

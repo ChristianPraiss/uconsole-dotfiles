@@ -5,8 +5,8 @@ battery_lvl() (
 	echo $(( $POWER_SUPPLY_ENERGY_NOW * 100 / $POWER_SUPPLY_ENERGY_FULL ))
 )
 brightness_lvl() { cat /sys/class/backlight/backlight@0/actual_brightness; }
-volume_lvl() { awk -F'[]%[]' '/Left:/ { print $2 }' <(amixer sget Master); }
-volume_status() { awk -F'[]%[]' '/Left:/ { print $5 }' <(amixer sget Master); }
+volume_lvl() { wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{printf "%.0f", $2 * 100}'; }
+volume_status() { wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED && echo "off" || echo "on"; }
 battery_status() { cat /sys/class/power_supply/axp20x-battery/status; }
 bluetooth_status() { hciconfig hci0 | sed -n '3 p' | tr -d \\t; }
 wifi_status() { echo ""; }

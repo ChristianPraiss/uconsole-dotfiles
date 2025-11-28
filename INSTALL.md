@@ -168,12 +168,12 @@ The uConsole volume keys should work with the XF86Audio keycodes. If they're not
 
 1. Test if ALSA detects your keys:
 ```bash
-# Install alsa-utils if not already installed
-sudo apt install alsa-utils
+# Install wireplumber/pipewire if not already installed
+sudo apt install wireplumber pipewire
 
 # Test volume control manually
-amixer set Master 5%+
-amixer set Master 5%-
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
 ```
 
 2. If manual commands work but keys don't, the keys might not be mapped correctly. Install `wev` to check what keys are being sent:
@@ -186,8 +186,8 @@ wev  # Press your volume keys and check output
 
 4. Make sure your audio device is not muted:
 ```bash
-amixer sget Master
-# Look for [on] or [off] in the output
+wpctl get-volume @DEFAULT_AUDIO_SINK@
+# Look for [MUTED] in the output
 ```
 
 ## Rolling Back
