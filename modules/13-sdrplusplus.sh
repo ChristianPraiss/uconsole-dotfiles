@@ -24,18 +24,11 @@ MODULE_DEPENDENCIES=("sway-core")
 install_module() {
     print_info "Installing ${MODULE_NAME}..."
 
-    # Install readsb first (required dependency)
-    print_info "Installing readsb (required dependency)..."
-    if ! sudo bash -c "$(wget -O - https://github.com/wiedehopf/adsb-scripts/raw/master/readsb-install.sh)"; then
-        print_error "Failed to install readsb"
-        return 1
-    fi
-
     # Install the HackerGadgets AIO board package
     print_info "Installing hackergadgets-uconsole-aio-board package..."
     print_info "This includes SDR++, RTL-SDR drivers, tar1090, PyGPSClient, and Meshtastic-MUI"
 
-    if ! apt_install hackergadgets-uconsole-aio-board; then
+    if ! sudo apt --install-recommends install hackergadgets-uconsole-aio-board; then
         print_error "Failed to install HackerGadgets AIO board package"
         return 1
     fi
