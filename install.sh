@@ -193,10 +193,20 @@ if [ "$SHELL" != "$(which zsh)" ]; then
     print_info "Default shell changed to zsh. You'll need to log out and back in for this to take effect."
 fi
 
+# Configure system power button handling
+print_info "Configuring power button to use Sway instead of systemd..."
+sudo mkdir -p /etc/systemd/logind.conf.d
+sudo cp "$SCRIPT_DIR/etc/systemd/logind.conf.d/power-button.conf" /etc/systemd/logind.conf.d/
+print_info "Power button will now open power menu instead of shutting down immediately"
+
 # Configure WiFi and Bluetooth
 print_info "Enabling and starting system services..."
 sudo systemctl enable --now NetworkManager
 sudo systemctl enable --now bluetooth
+
+# Restart logind to apply power button configuration
+print_info "Restarting systemd-logind to apply power button configuration..."
+sudo systemctl restart systemd-logind
 
 echo ""
 echo "=========================================="
