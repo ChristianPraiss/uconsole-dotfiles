@@ -4,9 +4,7 @@
 # Provides functions for tracking installation state
 #
 
-# Source common utilities
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/common.sh"
+# Source common utilities (assumes common.sh is already sourced by caller)
 
 # State directory
 STATE_DIR="$(get_script_dir)/.install-state"

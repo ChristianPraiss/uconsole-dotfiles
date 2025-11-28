@@ -4,11 +4,7 @@
 # Description: Installs core Sway window manager and Wayland components
 # Dependencies: none
 #
-
-# Source libraries
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../lib/common.sh"
-source "$SCRIPT_DIR/../lib/package-manager.sh"
+# Libraries are sourced by install.sh
 
 # Module metadata
 MODULE_ID="sway-core"
