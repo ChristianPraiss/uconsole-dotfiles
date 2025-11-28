@@ -44,7 +44,7 @@ Press OK to continue." 15 70
 select_modules() {
     local selected=$(whiptail --title "Select Components" \
         --checklist "Use SPACE to select/deselect, ARROW keys to navigate, ENTER to confirm:" \
-        24 78 13 \
+        24 78 14 \
         "system-tweaks" "System Tweaks - Quiet console, disable cloud-init" ON \
         "sway-core" "Sway/Wayland System - Window manager & core tools" ON \
         "audio" "Audio System - PipeWire audio stack" ON \
@@ -58,6 +58,7 @@ select_modules() {
         "notifications" "Notification Center - SwayNC with Catppuccin" ON \
         "greetd" "Display Manager - greetd with tuigreet" ON \
         "networking" "Networking & Firewall - UFW with SSH on port 22" ON \
+        "sdrplusplus" "HackerGadgets AIO - SDR++, RTL-SDR, LoRa, GPS" OFF \
         3>&1 1>&2 2>&3)
 
     # Remove quotes from whiptail output
@@ -65,13 +66,13 @@ select_modules() {
 }
 
 # Resolve dependencies and sort modules in execution order
-# Fixed execution order: 00 -> 01 -> 02 -> 03 -> 04 -> 05 -> 06 -> 07 -> 08 -> 09 -> 10 -> 11
+# Fixed execution order: 00 -> 01 -> 02 -> 03 -> 04 -> 05 -> 06 -> 07 -> 08 -> 09 -> 10 -> 11 -> 12 -> 13
 resolve_dependencies() {
     local selected="$1"
     local ordered=""
 
     # Define all modules in dependency order
-    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "greetd" "networking")
+    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "greetd" "networking" "sdrplusplus")
 
     # Filter to include only selected modules in correct order
     for module in "${all_modules[@]}"; do

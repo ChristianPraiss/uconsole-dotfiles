@@ -33,6 +33,8 @@ install_module() {
         wget
         jq
         pavucontrol
+        udisks2
+        udiskie
     )
 
     # Install packages

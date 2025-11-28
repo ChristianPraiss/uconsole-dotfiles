@@ -27,7 +27,6 @@ install_module() {
         wlr-randr
         xdg-utils
         xdg-desktop-portal-wlr
-        dunst
     )
 
     # Install packages

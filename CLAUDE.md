@@ -83,6 +83,7 @@ Modules are numbered to enforce dependency order:
 10. `10-notifications.sh` - SwayNC notification center with Catppuccin
 11. `11-greetd.sh` - greetd display manager with tuigreet TUI greeter
 12. `12-networking.sh` - UFW firewall and SSH server configuration
+13. `13-sdrplusplus.sh` - HackerGadgets AIO board (SDR++, RTL-SDR, LoRa, GPS)
 
 The installer resolves and executes modules in this fixed order regardless of selection order.
 
@@ -214,6 +215,36 @@ Module 11 installs and configures greetd display manager with tuigreet:
 - User: `greeter`
 
 **Important**: greetd service is enabled but not started during installation (to avoid killing the current session). A reboot is required after installation.
+
+## HackerGadgets AIO Board (SDR++)
+
+Module 13 is an optional module that installs the HackerGadgets AIO board package:
+
+**Hardware**: The HackerGadgets AIO Board is an expansion package for uConsole with CM4/CM5 that integrates:
+- RTL-SDR receiver for software-defined radio
+- LoRa/Meshtastic radio module for mesh networking
+- GPS receiver with RTC (Real-Time Clock)
+- USB Hub for peripheral connectivity
+
+**What the module installs:**
+- SDR++ (brown variant) - Signal processing software
+- tar1090 - ADS-B flight tracking interface
+- PyGPSClient - GPS diagnostic tool
+- Meshtastic-MUI - Mesh networking application
+- readsb service - Aviation data decoding
+- All necessary RTL-SDR drivers and udev rules
+
+**Installation**: The module runs:
+```bash
+apt --install-recommends install hackergadgets-uconsole-aio-board
+```
+
+**Important notes:**
+- A reboot is required after installation for all services to function
+- SPI must be enabled for Meshtastic functionality on CM5
+- All drivers are pre-compiled and configured for compatibility
+
+**Reference**: https://forum.clockworkpi.com/t/hackergadgets-aio-board-package/17875
 
 ## Color Scheme
 

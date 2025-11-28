@@ -1,0 +1,7 @@
+# vim: ft=swayconfig
+
+# Start udiskie daemon for automatic USB/SD card mounting
+# -a: Auto-mount on insertion
+# -n: Use notifications (requires notification daemon like swaync)
+# -t: Use tray icon (optional, can be removed if you don't want it)
+exec udiskie -a -n

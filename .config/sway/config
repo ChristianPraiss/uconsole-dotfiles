@@ -62,6 +62,7 @@ include config.d/statusbar
 include config.d/media
 include config.d/windows
 include config.d/notifications
+include config.d/automount
 
 
 exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
