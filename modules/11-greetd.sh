@@ -130,23 +130,9 @@ EOF
     sudo mkdir -p /etc/greetd
 
     # Deploy greetd configuration from repository or create it
-    if [ -f "$repo_dir/etc/greetd/config.toml" ]; then
-        print_info "Deploying greetd configuration from repository..."
-        sudo cp "$repo_dir/etc/greetd/config.toml" /etc/greetd/
-        print_success "greetd configuration deployed"
-    else
-        # Fallback: create configuration inline
-        print_info "Creating greetd configuration..."
-        sudo tee /etc/greetd/config.toml > /dev/null <<'EOF'
-[terminal]
-vt = 1
-
-[default_session]
-command = "/usr/local/bin/tuigreet --time --remember --remember-session --cmd sway"
-user = "greeter"
-EOF
-        print_success "greetd configuration created"
-    fi
+    print_info "Deploying greetd configuration from repository..."
+    sudo cp "$repo_dir/etc/greetd/config.toml" /etc/greetd/
+    print_success "greetd configuration deployed"
 
     # Set default target to graphical.target (required for display-manager.service)
     print_info "Setting default target to graphical.target..."
