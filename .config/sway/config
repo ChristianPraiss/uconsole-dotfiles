@@ -9,7 +9,7 @@
 set $mod Mod1
 
 set $term foot
-set $menu wofi | xargs swaymsg exec --
+set $menu wofi --show drun | xargs swaymsg exec --
 
 font JetBrainsMono Nerd Font Bold 18
 
