@@ -100,11 +100,17 @@ mkdir -p "$FONT_DIR"
 
 if [ ! -f "$FONT_DIR/JetBrainsMonoNerdFont-Regular.ttf" ]; then
     cd /tmp
-    wget -q https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
-    unzip -q JetBrainsMono.zip -d JetBrainsMono
-    cp JetBrainsMono/*.ttf "$FONT_DIR/"
-    rm -rf JetBrainsMono JetBrainsMono.zip
-    print_info "JetBrainsMono Nerd Font installed"
+    print_info "Downloading JetBrainsMono Nerd Font (this may take a moment)..."
+    wget -q --show-progress https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -O JetBrainsMono.zip
+
+    if [ -f JetBrainsMono.zip ]; then
+        unzip -q JetBrainsMono.zip -d JetBrainsMono
+        find JetBrainsMono -name "*.ttf" -exec cp {} "$FONT_DIR/" \;
+        rm -rf JetBrainsMono JetBrainsMono.zip
+        print_info "JetBrainsMono Nerd Font installed"
+    else
+        print_warning "Failed to download JetBrainsMono Nerd Font, skipping..."
+    fi
 else
     print_info "JetBrainsMono Nerd Font already installed, skipping..."
 fi
@@ -113,11 +119,23 @@ fi
 print_info "Installing Departure Mono font..."
 if [ ! -f "$FONT_DIR/DepartureMono-Regular.otf" ]; then
     cd /tmp
-    wget -q https://github.com/rektdeckard/departure-mono/releases/latest/download/DepartureMono.zip
-    unzip -q DepartureMono.zip -d DepartureMono
-    cp DepartureMono/*.otf "$FONT_DIR/" 2>/dev/null || cp DepartureMono/*.ttf "$FONT_DIR/" 2>/dev/null || true
-    rm -rf DepartureMono DepartureMono.zip
-    print_info "Departure Mono font installed"
+    # Get the actual download URL from GitHub API
+    DEPARTURE_URL=$(curl -s https://api.github.com/repos/rektdeckard/departure-mono/releases/latest | grep "browser_download_url.*zip" | cut -d '"' -f 4)
+
+    if [ -n "$DEPARTURE_URL" ]; then
+        wget -q "$DEPARTURE_URL" -O DepartureMono.zip
+        if [ -f DepartureMono.zip ]; then
+            unzip -q DepartureMono.zip -d DepartureMono
+            find DepartureMono -name "*.otf" -exec cp {} "$FONT_DIR/" \; 2>/dev/null || \
+            find DepartureMono -name "*.ttf" -exec cp {} "$FONT_DIR/" \; 2>/dev/null || true
+            rm -rf DepartureMono DepartureMono.zip
+            print_info "Departure Mono font installed"
+        else
+            print_warning "Failed to download Departure Mono, skipping..."
+        fi
+    else
+        print_warning "Could not find Departure Mono download URL, skipping..."
+    fi
 else
     print_info "Departure Mono font already installed, skipping..."
 fi
