@@ -45,7 +45,16 @@ sudo apt install -y \
     wtype \
     wlr-randr \
     xdg-utils \
-    xdg-desktop-portal-wlr
+    xdg-desktop-portal-wlr \
+    dunst
+
+print_info "Installing PipeWire audio system..."
+sudo apt install -y \
+    pipewire \
+    pipewire-alsa \
+    pipewire-pulse \
+    wireplumber \
+    pavucontrol
 
 print_info "Installing terminal and shell..."
 sudo apt install -y \
