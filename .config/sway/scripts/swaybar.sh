@@ -11,6 +11,36 @@ battery_status() { cat /sys/class/power_supply/axp20x-battery/status; }
 bluetooth_status() { hciconfig hci0 | sed -n '3 p' | tr -d \\t; }
 wifi_status() { echo ""; }
 
+# Handle click events
+handle_click() {
+	local name="$1"
+	case "$name" in
+		wifi)
+			kitty --class=floating-terminal nmtui &
+			;;
+		bluetooth)
+			kitty --class=floating-terminal bluetuith &
+			;;
+		volume)
+			pavucontrol &
+			;;
+	esac
+}
+
+# Read click events in background
+read_events() {
+	while read -r line; do
+		# Parse the JSON click event
+		name=$(echo "$line" | jq -r '.name // empty' 2>/dev/null)
+		if [ -n "$name" ]; then
+			handle_click "$name"
+		fi
+	done
+}
+
+# Start event reader in background
+read_events &
+
 battery_icon() {
 	if [ "$2" == "Charging" ]; then
 		if [ "$1" -ge 90 ]; then echo '󱊦';

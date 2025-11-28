@@ -1,0 +1,7 @@
+# vim: ft=swayconfig
+
+# Start SwayNotificationCenter daemon
+exec swaync
+
+# Keybinding to toggle notification center
+bindsym $mod+Shift+n exec swaync-client -t -sw
