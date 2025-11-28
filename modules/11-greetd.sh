@@ -90,11 +90,35 @@ install_module() {
         print_info "greeter user already exists"
     fi
 
-    # Disable getty@tty1 to prevent conflicts with greetd
-    print_info "Disabling getty@tty1 to prevent conflicts..."
+    # Create systemd override to conflict with getty@tty1 (greetd uses VT1)
+    print_info "Creating greetd systemd override..."
+    sudo mkdir -p /etc/systemd/system/greetd.service.d
+
+    local repo_dir="$(get_script_dir)"
+    if [ -f "$repo_dir/etc/systemd/system/greetd.service.d/override.conf" ]; then
+        print_info "Deploying greetd systemd override from repository..."
+        sudo cp "$repo_dir/etc/systemd/system/greetd.service.d/override.conf" \
+                /etc/systemd/system/greetd.service.d/
+    else
+        # Fallback: create override inline
+        sudo tee /etc/systemd/system/greetd.service.d/override.conf > /dev/null <<'EOF'
+[Unit]
+After=systemd-user-sessions.service plymouth-quit-wait.service
+After=getty@tty1.service
+Conflicts=getty@tty1.service
+EOF
+    fi
+    print_success "greetd systemd override created"
+
+    # Reload systemd to apply override
+    print_info "Reloading systemd daemon..."
+    sudo systemctl daemon-reload
+
+    # Stop and disable getty@tty1 to prevent conflicts with greetd
+    print_info "Stopping and disabling getty@tty1..."
+    sudo systemctl stop getty@tty1 &>/dev/null || true
     sudo systemctl disable getty@tty1 &>/dev/null || true
-    sudo systemctl mask getty@tty1 &>/dev/null || true
-    print_success "getty@tty1 disabled"
+    print_success "getty@tty1 stopped and disabled"
 
     # Backup existing greetd configuration if it exists
     if [ -f /etc/greetd/config.toml ]; then
@@ -106,7 +130,6 @@ install_module() {
     sudo mkdir -p /etc/greetd
 
     # Deploy greetd configuration from repository or create it
-    local repo_dir="$(get_script_dir)"
     if [ -f "$repo_dir/etc/greetd/config.toml" ]; then
         print_info "Deploying greetd configuration from repository..."
         sudo cp "$repo_dir/etc/greetd/config.toml" /etc/greetd/
@@ -123,6 +146,14 @@ command = "/usr/local/bin/tuigreet --time --remember --remember-session --cmd sw
 user = "greeter"
 EOF
         print_success "greetd configuration created"
+    fi
+
+    # Set default target to graphical.target (required for display-manager.service)
+    print_info "Setting default target to graphical.target..."
+    if sudo systemctl set-default graphical.target; then
+        print_success "Default target set to graphical.target"
+    else
+        print_warning "Failed to set default target"
     fi
 
     # Enable and start greetd service
