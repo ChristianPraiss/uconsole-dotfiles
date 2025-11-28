@@ -125,7 +125,7 @@ EOF
         print_success "greetd configuration created"
     fi
 
-    # Enable greetd service (but don't start it - would kill current session)
+    # Enable and start greetd service
     print_info "Enabling greetd service..."
     if sudo systemctl enable greetd; then
         print_success "greetd service enabled"
@@ -134,9 +134,16 @@ EOF
         return 1
     fi
 
+    print_info "Starting greetd service..."
+    if sudo systemctl start greetd; then
+        print_success "greetd service started"
+    else
+        print_warning "Failed to start greetd service (may require reboot)"
+    fi
+
     print_success "greetd installed and configured successfully"
-    print_warning "IMPORTANT: Please reboot for greetd to take effect"
-    print_info "After reboot, you'll be greeted by the tuigreet TUI login screen"
+    print_info "tuigreet login screen is now active on VT1"
+    print_info "Switch to VT1 (Ctrl+Alt+F1) to see the login screen"
 
     return 0
 }
