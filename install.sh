@@ -222,6 +222,12 @@ cp -r "$SCRIPT_DIR/.config"/* "$HOME/.config/"
 # Make scripts executable
 chmod +x "$HOME/.config/sway/scripts/"*.sh
 
+# Configure GTK theme using gsettings for GNOME applications
+print_info "Configuring GTK theme and dark mode preference..."
+gsettings set org.gnome.desktop.interface gtk-theme 'catppuccin-mocha-mauve-standard+default'
+gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+print_info "GTK theme set to Catppuccin Mocha with dark mode"
+
 # Change default shell to zsh
 if [ "$SHELL" != "$(which zsh)" ]; then
     print_info "Changing default shell to zsh..."
