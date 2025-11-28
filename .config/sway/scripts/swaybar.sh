@@ -67,7 +67,22 @@ wifi_icon() {
 	WIFI_STATE=$(nmcli -t -f STATE general 2>/dev/null)
 
 	if [ "$WIFI_STATE" == "connected (site only)" ] || [ "$WIFI_STATE" == "connected (local only)" ] || [ "$WIFI_STATE" == "connected" ]; then
-		echo '󰖩'  # WiFi connected icon
+		# Get signal strength (0-100)
+		SIGNAL=$(nmcli -t -f IN-USE,SIGNAL dev wifi | grep '^\*' | cut -d':' -f2)
+
+		if [ -z "$SIGNAL" ]; then
+			echo '󰖩'  # WiFi connected icon (fallback)
+		elif [ "$SIGNAL" -ge 80 ]; then
+			echo '󰤨'  # Excellent signal (4 bars)
+		elif [ "$SIGNAL" -ge 60 ]; then
+			echo '󰤥'  # Good signal (3 bars)
+		elif [ "$SIGNAL" -ge 40 ]; then
+			echo '󰤢'  # Fair signal (2 bars)
+		elif [ "$SIGNAL" -ge 20 ]; then
+			echo '󰤟'  # Weak signal (1 bar)
+		else
+			echo '󰤯'  # Very weak signal
+		fi
 	else
 		echo '󱛅'  # WiFi disconnected icon
 	fi
@@ -99,16 +114,10 @@ cat << EOT
 		"separator": true
 	},
 	{
-		"name": "brightness",
-		"full_text": "$(brightness_icon $BRIGHTNESS_LVL) $BRIGHTNESS_LVL",
-		"urgent": false,
-		"separator": true
-	},
-	{
 		"name": "volume",
 		"full_text": "$(volume_icon $VOLUME_LVL $VOLUME_STATUS) $VOLUME_LVL%",
 		"urgent": false,
-		"separator": true	
+		"separator": true
 	},
 	{
 		"name": "battery",
