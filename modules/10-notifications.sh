@@ -21,7 +21,7 @@ install_module() {
     print_info "Installing build dependencies..."
     if ! apt_install meson ninja-build libgtk-3-dev libgtk-layer-shell-dev \
                      libjson-glib-dev libglib2.0-dev scdoc libpulse-dev \
-                     git; then
+                     valac git; then
         print_error "Failed to install build dependencies"
         return 1
     fi
