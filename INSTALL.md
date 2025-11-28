@@ -59,8 +59,8 @@ fi
 
 ### System Packages (via apt)
 - **Sway ecosystem**: sway, swayidle, swaylock, swaybg, wl-clipboard
-- **Terminal**: foot, zsh
-- **Applications**: wofi, qutebrowser, ranger, neovim, htop
+- **Terminal**: kitty, zsh
+- **Applications**: wofi, qutebrowser, nautilus, neovim, htop
 - **Utilities**: brightnessctl, alsa-utils, bluez, network-manager, grim, slurp, jq, git
 - **Fonts**: fonts-terminus, fonts-font-awesome, fonts-noto
 
@@ -73,7 +73,7 @@ fi
 ### Dotfiles Installed
 - Shell config: `.zshrc`, `.zprofile`, `.zshenv`
 - Sway config: `.config/sway/`
-- App configs: `.config/foot/`, `.config/nvim/`, `.config/ranger/`, `.config/kitty/`, etc.
+- App configs: `.config/nvim/`, `.config/kitty/`, etc.
 
 ## Disk Space Requirements
 
@@ -88,13 +88,14 @@ Approximate disk space needed:
 
 After installation and starting Sway for the first time:
 
-1. ✅ Test terminal: Press `Alt+Return`
-2. ✅ Test app launcher: Press `Alt+d`
-3. ✅ Check status bar for battery, WiFi, time
-4. ✅ Test brightness: Press `XF86MonBrightnessUp`/`Down` (Fn+brightness keys)
-5. ✅ Test volume: Press `XF86AudioRaiseVolume`/`LowerVolume` (Fn+volume keys)
-6. ✅ Take a screenshot: Press `Alt+p`, then `s`
-7. ✅ Open Neovim to trigger plugin installation: `nvim` (wait for plugins to install)
+1. ✅ Test terminal: Press `Alt+Return` (opens Kitty)
+2. ✅ Test app launcher: Press `Alt+d` (opens Wofi)
+3. ✅ Open file manager: Launch Nautilus from Wofi
+4. ✅ Check status bar for battery, WiFi, time
+5. ✅ Test brightness: Press `XF86MonBrightnessUp`/`Down` (Fn+brightness keys)
+6. ✅ Test volume: Press `XF86AudioRaiseVolume`/`LowerVolume` (Fn+volume keys)
+7. ✅ Take a screenshot: Press `Alt+p`, then `s`
+8. ✅ Open Neovim to trigger plugin installation: `nvim` (wait for plugins to install)
 
 ## Troubleshooting
 

@@ -8,7 +8,7 @@
 # Logo key. Mod1 is for Alt.
 set $mod Mod1
 
-set $term foot
+set $term kitty
 set $menu wofi --show drun | xargs swaymsg exec --
 
 font JetBrainsMono Nerd Font Bold 18

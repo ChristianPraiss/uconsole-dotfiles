@@ -9,12 +9,11 @@ This configuration provides a minimal, keyboard-focused environment optimized fo
 ### Included Configurations
 
 - **Sway** - Tiling Wayland compositor with uConsole-specific settings
-- **Foot** - Fast, lightweight terminal emulator
-- **Kitty** - Alternative terminal emulator
+- **Kitty** - GPU-accelerated terminal emulator
 - **Wofi** - Application launcher and power menu
 - **Neovim** - Custom editor configuration
 - **Qutebrowser** - Keyboard-driven web browser
-- **Ranger** - Terminal file manager with devicons
+- **Nautilus** - GNOME file manager
 - **Zsh** - Minimal shell configuration
 - **htop** - System monitor
 
@@ -64,8 +63,8 @@ If you prefer to install manually or customize the process:
 sudo apt update
 sudo apt install -y \
     sway swayidle swaylock swaybg \
-    foot zsh git curl wget \
-    wofi qutebrowser ranger neovim htop \
+    kitty zsh git curl wget \
+    wofi qutebrowser nautilus neovim htop \
     brightnessctl alsa-utils bluez network-manager \
     grim slurp jq wl-clipboard \
     fonts-terminus fonts-font-awesome fonts-noto
@@ -123,7 +122,7 @@ To start Sway automatically on login, the install script suggests adding auto-st
 
 | Key Binding | Action |
 |------------|---------|
-| `Alt+Return` | Open terminal (foot) |
+| `Alt+Return` | Open terminal (kitty) |
 | `Alt+d` | Application launcher (wofi) |
 | `Alt+Shift+q` | Kill focused window |
 | `Alt+Shift+c` | Reload Sway configuration |
@@ -196,9 +195,7 @@ The status bar script is located at `.config/sway/scripts/swaybar.sh`
 ### Applications
 
 - Neovim: `.config/nvim/` - Custom setup
-- Foot terminal: `.config/foot/foot.ini`
 - Kitty terminal: `.config/kitty/kitty.conf`
-- Ranger: `.config/ranger/rc.conf`
 - Qutebrowser: `.config/qutebrowser/config.py`
 - Starship: `.config/starship.toml` (optional prompt)
 - htop: `.config/htop/htoprc`
@@ -296,11 +293,11 @@ nvim --headless "+Lazy! sync" +qa
 ### Required Packages
 
 - sway, swayidle, swaylock, swaybg
-- foot
+- kitty
 - zsh, git, curl, wget
 - wofi
 - qutebrowser
-- ranger
+- nautilus
 - neovim
 - htop
 - brightnessctl
@@ -323,10 +320,6 @@ The installation script automatically installs:
 
 The installation script also installs:
 - **Starship** - Cross-shell prompt (configured via `.config/starship.toml`)
-
-### Optional Packages
-
-- kitty (alternative terminal)
 
 ## Hardware-Specific Notes
 

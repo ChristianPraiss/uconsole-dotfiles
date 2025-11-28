@@ -46,7 +46,7 @@ for file in .zshrc .zprofile .zshenv; do
 done
 
 # Backup .config directories
-for dir in sway foot nvim ranger qutebrowser htop kitty; do
+for dir in sway nvim qutebrowser htop kitty; do
     if [ -d "$HOME/.config/$dir" ]; then
         print_info "Backing up .config/$dir"
         mkdir -p "$BACKUP_DIR/.config"
@@ -113,7 +113,7 @@ fi
 echo "Changes applied:"
 echo "  ✓ Shell configuration (.zshrc, .zprofile, .zshenv)"
 echo "  ✓ Sway configuration"
-echo "  ✓ Application configs (foot, nvim, ranger, kitty, etc.)"
+echo "  ✓ Application configs (nvim, kitty, etc.)"
 echo ""
 
 if pgrep -x "sway" > /dev/null; then

@@ -49,7 +49,7 @@ sudo apt install -y \
 
 print_info "Installing terminal and shell..."
 sudo apt install -y \
-    foot \
+    kitty \
     zsh \
     git \
     curl \
@@ -60,7 +60,7 @@ print_info "Installing application launcher and utilities..."
 sudo apt install -y \
     wofi \
     qutebrowser \
-    ranger \
+    nautilus \
     neovim \
     htop
 
@@ -166,7 +166,7 @@ for file in .zshrc .zprofile .zshenv; do
     fi
 done
 
-for dir in sway foot nvim ranger qutebrowser htop kitty; do
+for dir in sway nvim qutebrowser htop kitty; do
     if [ -d "$HOME/.config/$dir" ]; then
         print_warning "Backing up existing .config/$dir to $BACKUP_DIR"
         mv "$HOME/.config/$dir" "$BACKUP_DIR/"
@@ -212,7 +212,7 @@ echo "     exec sway"
 echo "   fi"
 echo ""
 echo "Key bindings:"
-echo "  Alt+Return     - Open terminal (foot)"
+echo "  Alt+Return     - Open terminal (kitty)"
 echo "  Alt+d          - Application launcher (wofi)"
 echo "  Alt+Shift+q    - Close window"
 echo "  Alt+Shift+c    - Reload Sway config"
