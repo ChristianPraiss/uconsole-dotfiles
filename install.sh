@@ -70,7 +70,8 @@ sudo apt install -y \
     alsa-utils \
     bluez \
     network-manager \
-    systemd
+    systemd \
+    gnome-themes-extra
 
 print_info "Installing screenshot dependencies..."
 sudo apt install -y \
@@ -140,6 +141,41 @@ fi
 
 fc-cache -f
 
+# Install Catppuccin Mocha GTK theme
+print_info "Installing Catppuccin Mocha GTK theme..."
+THEME_DIR="$HOME/.themes"
+mkdir -p "$THEME_DIR"
+
+if [ ! -d "$THEME_DIR/Catppuccin-Mocha-Standard-Mauve-Dark" ]; then
+    print_info "Downloading Catppuccin GTK theme..."
+
+    # Clone the repository with submodules
+    if [ -d /tmp/catppuccin-gtk ]; then
+        rm -rf /tmp/catppuccin-gtk
+    fi
+
+    git clone --depth=1 https://github.com/catppuccin/gtk.git /tmp/catppuccin-gtk
+
+    if [ -d /tmp/catppuccin-gtk ]; then
+        cd /tmp/catppuccin-gtk
+
+        # Install dependencies for building
+        sudo apt install -y sassc
+
+        # Build and install Mocha variant with Mauve accent
+        python3 install.py mocha -a mauve -s standard -d "$THEME_DIR"
+
+        cd "$SCRIPT_DIR"
+        rm -rf /tmp/catppuccin-gtk
+
+        print_info "Catppuccin Mocha GTK theme installed"
+    else
+        print_warning "Failed to clone Catppuccin GTK theme, skipping..."
+    fi
+else
+    print_info "Catppuccin Mocha GTK theme already installed, skipping..."
+fi
+
 # Install Starship prompt
 print_info "Installing Starship prompt..."
 if ! command -v starship &> /dev/null; then
@@ -166,7 +202,7 @@ for file in .zshrc .zprofile .zshenv; do
     fi
 done
 
-for dir in sway nvim qutebrowser htop kitty; do
+for dir in sway nvim qutebrowser htop kitty gtk-3.0 gtk-4.0; do
     if [ -d "$HOME/.config/$dir" ]; then
         print_warning "Backing up existing .config/$dir to $BACKUP_DIR"
         mv "$HOME/.config/$dir" "$BACKUP_DIR/"
