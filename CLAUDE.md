@@ -13,7 +13,7 @@ This is a dotfiles configuration repository for the ClockworkPi uConsole running
 The installer follows a modular architecture where each component is an independent, self-contained module:
 
 - **Main Script**: `install.sh` - Interactive TUI installer using whiptail
-- **Modules**: `modules/XX-name.sh` - Individual installation modules numbered for dependency order (00-11)
+- **Modules**: `modules/XX-name.sh` - Individual installation modules numbered for dependency order (00-12)
 - **Libraries**: `lib/*.sh` - Shared utilities sourced by modules and main installer
 
 **Critical**: Module scripts assume libraries are already sourced by the caller (install.sh). Never source libraries within modules. Libraries are sourced once at the top level in install.sh:
@@ -82,6 +82,7 @@ Modules are numbered to enforce dependency order:
 9. `09-services.sh` - Enable NetworkManager, Bluetooth
 10. `10-notifications.sh` - SwayNC notification center with Catppuccin
 11. `11-greetd.sh` - greetd display manager with tuigreet TUI greeter
+12. `12-networking.sh` - UFW firewall and SSH server configuration
 
 The installer resolves and executes modules in this fixed order regardless of selection order.
 

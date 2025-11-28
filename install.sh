@@ -44,7 +44,7 @@ Press OK to continue." 15 70
 select_modules() {
     local selected=$(whiptail --title "Select Components" \
         --checklist "Use SPACE to select/deselect, ARROW keys to navigate, ENTER to confirm:" \
-        23 78 12 \
+        24 78 13 \
         "system-tweaks" "System Tweaks - Quiet console, disable cloud-init" ON \
         "sway-core" "Sway/Wayland System - Window manager & core tools" ON \
         "audio" "Audio System - PipeWire audio stack" ON \
@@ -57,6 +57,7 @@ select_modules() {
         "services" "System Services - NetworkManager, Bluetooth" ON \
         "notifications" "Notification Center - SwayNC with Catppuccin" ON \
         "greetd" "Display Manager - greetd with tuigreet" ON \
+        "networking" "Networking & Firewall - UFW with SSH on port 22" ON \
         3>&1 1>&2 2>&3)
 
     # Remove quotes from whiptail output
@@ -70,7 +71,7 @@ resolve_dependencies() {
     local ordered=""
 
     # Define all modules in dependency order
-    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "greetd")
+    local all_modules=("system-tweaks" "sway-core" "audio" "terminal-shell" "applications" "screenshots" "fonts" "gtk-theme" "dotfiles" "services" "notifications" "greetd" "networking")
 
     # Filter to include only selected modules in correct order
     for module in "${all_modules[@]}"; do
