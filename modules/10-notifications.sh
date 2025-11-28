@@ -17,11 +17,55 @@ MODULE_DEPENDENCIES=("sway-core")
 install_module() {
     print_info "Installing ${MODULE_NAME}..."
 
-    # Install sway-notification-center package
-    if ! apt_install "sway-notification-center"; then
-        print_error "Failed to install sway-notification-center"
+    # Install build dependencies
+    print_info "Installing build dependencies..."
+    if ! apt_install meson ninja-build libgtk-3-dev libgtk-layer-shell-dev \
+                     libjson-glib-dev libglib2.0-dev scdoc libpulse-dev \
+                     git; then
+        print_error "Failed to install build dependencies"
         return 1
     fi
+
+    # Create temporary build directory
+    BUILD_DIR="/tmp/swaync-build-$$"
+    mkdir -p "$BUILD_DIR"
+
+    print_info "Cloning SwayNC repository..."
+    if ! git clone https://github.com/ErikReider/SwayNotificationCenter.git "$BUILD_DIR"; then
+        print_error "Failed to clone SwayNC repository"
+        rm -rf "$BUILD_DIR"
+        return 1
+    fi
+
+    # Build and install SwayNC
+    print_info "Building SwayNC from source (this may take a few minutes)..."
+    cd "$BUILD_DIR" || return 1
+
+    if ! meson setup build; then
+        print_error "Meson setup failed"
+        cd - > /dev/null
+        rm -rf "$BUILD_DIR"
+        return 1
+    fi
+
+    if ! ninja -C build; then
+        print_error "Build failed"
+        cd - > /dev/null
+        rm -rf "$BUILD_DIR"
+        return 1
+    fi
+
+    print_info "Installing SwayNC..."
+    if ! sudo ninja -C build install; then
+        print_error "Installation failed"
+        cd - > /dev/null
+        rm -rf "$BUILD_DIR"
+        return 1
+    fi
+
+    cd - > /dev/null
+    rm -rf "$BUILD_DIR"
+    print_success "SwayNC built and installed successfully"
 
     # Create SwayNC config directory
     print_info "Creating SwayNC configuration directory..."
@@ -60,8 +104,8 @@ install_module() {
 
 # Check if module is already installed
 check_installed() {
-    # Check if sway-notification-center package is installed
-    if apt_check_installed "sway-notification-center"; then
+    # Check if swaync binary is available
+    if command -v swaync &> /dev/null; then
         return 0
     else
         return 1
@@ -70,7 +114,7 @@ check_installed() {
 
 # Estimate installation time (seconds)
 estimate_time() {
-    echo "90"  # ~1.5 minutes
+    echo "300"  # ~5 minutes (building from source)
 }
 
 # Prevent direct execution
