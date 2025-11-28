@@ -15,9 +15,9 @@ bar {
 	colors {
         statusline #111111
 		separator  #111111
-        background #fe8019
-        inactive_workspace #d65f0e #d65f0e #111111
-        focused_workspace #111111 #111111 #fe8019
+        background #cba6f7
+        inactive_workspace #b4a1e8 #b4a1e8 #111111
+        focused_workspace #111111 #111111 #cba6f7
 		urgent_workspace #cc241d #cc241d #fbf1c7
     }
 }

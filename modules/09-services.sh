@@ -32,13 +32,9 @@ install_module() {
         print_warning "Failed to enable Bluetooth"
     fi
 
-    # Restart logind to apply power button configuration
-    print_info "Restarting systemd-logind to apply power button configuration..."
-    if sudo systemctl restart systemd-logind; then
-        print_info "systemd-logind restarted successfully"
-    else
-        print_warning "Failed to restart systemd-logind"
-    fi
+    # Note: systemd-logind restart is needed for power button configuration
+    # but restarting it during installation breaks the current session
+    print_info "Note: Power button configuration will take effect after reboot or logout/login"
 
     print_success "System services configured successfully"
     return 0
