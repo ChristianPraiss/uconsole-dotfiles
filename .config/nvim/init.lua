@@ -16,6 +16,8 @@ require("catppuccin").setup({
 vim.cmd("colorscheme catppuccin-mocha")
 vim.o.background = "dark"
 
+vim.opt.clipboard = "unnamed"
+
 vim.diagnostic.config({ virtual_text = true })
 vim.opt.completeopt = { "menuone", "noselect", "popup" }
 vim.keymap.set({ "n" }, "<leader>ee", function()
